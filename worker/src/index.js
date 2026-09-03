@@ -9,8 +9,7 @@
 import { authenticate, authenticateIngest } from './auth.js';
 import { FEED_ORDER, feedConditions, listingToRow, rowToListing, upsertStatement } from './db.js';
 import { corsHeaders, error, json, readJson } from './http.js';
-import { validateSubmission } from './validate.js';
-import { normalizeListing } from './schema.js';
+import { normalizeListing, validateSubmission } from './schema.js';
 
 const MAX_LIMIT = 50;
 const DEFAULT_LIMIT = 20;

@@ -8,10 +8,12 @@ import { CitySheet } from './components/CitySheet.jsx';
 import { FiltersSheet } from './components/FiltersSheet.jsx';
 import { ListingSheet } from './components/ListingSheet.jsx';
 import { FavoritesSheet } from './components/FavoritesSheet.jsx';
+import { SubmitSheet } from './components/SubmitSheet.jsx';
+import { MyListingsSheet } from './components/MyListingsSheet.jsx';
 import { useListings } from './hooks/useListings.js';
 import { useFavorites } from './hooks/useFavorites.js';
 import { useDebounced } from './hooks/useDebounced.js';
-import { getCityCounts } from './lib/api.js';
+import { getCityCounts, hasBackend } from './lib/api.js';
 import { CITIES, EMPTY_FILTERS, districtsOf, countActiveFilters, makeFilters } from './lib/schema.js';
 import { plural } from './lib/format.js';
 import { storage } from './lib/storage.js';
@@ -26,6 +28,8 @@ export default function App() {
   const [sheets, setSheets] = useState([]);
   const [openListing, setOpenListing] = useState(null);
   const [cityCounts, setCityCounts] = useState(null);
+  // Меняется после отправки заявки, чтобы «Мои объявления» перечитали список.
+  const [submittedAt, setSubmittedAt] = useState(0);
 
   const favorites = useFavorites();
   const debouncedQuery = useDebounced(query, 350);
@@ -123,6 +127,7 @@ export default function App() {
         onOpenCity={() => openSheet('city')}
         onOpenFilters={() => openSheet('filters')}
         onOpenFavorites={() => openSheet('favorites')}
+        onOpenSubmit={hasBackend ? () => openSheet('submit') : null}
         activeFilters={activeFilters}
         favoritesCount={favorites.ids.length}
         query={query}
@@ -205,6 +210,23 @@ export default function App() {
         open={sheets.includes('favorites')}
         onClose={() => closeSheet('favorites')}
         ids={favorites.ids}
+        isFavorite={favorites.has}
+        onToggleFavorite={favorites.toggle}
+        onOpen={openCard}
+      />
+
+      <SubmitSheet
+        open={sheets.includes('submit')}
+        onClose={() => closeSheet('submit')}
+        city={filters.city}
+        onSubmitted={() => setSubmittedAt(Date.now())}
+        onOpenMine={() => openSheet('mine')}
+      />
+
+      <MyListingsSheet
+        open={sheets.includes('mine')}
+        onClose={() => closeSheet('mine')}
+        reloadKey={submittedAt}
         isFavorite={favorites.has}
         onToggleFavorite={favorites.toggle}
         onOpen={openCard}

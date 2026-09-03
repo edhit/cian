@@ -17,15 +17,26 @@ function authHeaders() {
   return initData ? { Authorization: `tma ${initData}` } : {};
 }
 
+function buildHeaders(options) {
+  return {
+    Accept: 'application/json',
+    ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+    ...authHeaders(),
+    ...(options.headers || {}),
+  };
+}
+
+/** Запрос, который не бросает на 4xx: вызывающему нужен разбор причины. */
+async function requestRaw(path, options = {}) {
+  const response = await fetch(`${BASE}${path}`, { ...options, headers: buildHeaders(options) });
+  const data = await response.json().catch(() => null);
+  return { status: response.status, ok: response.ok, data };
+}
+
 async function request(path, options = {}) {
   const response = await fetch(`${BASE}${path}`, {
     ...options,
-    headers: {
-      Accept: 'application/json',
-      ...(options.body ? { 'Content-Type': 'application/json' } : {}),
-      ...authHeaders(),
-      ...(options.headers || {}),
-    },
+    headers: buildHeaders(options),
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return response.json();
@@ -140,13 +151,48 @@ export async function getCityCounts(deal) {
 
 /* ------------------------------ запись ----------------------------------- */
 
+/**
+ * @returns {Promise<{ok: true, id: string, status: string}
+ *                 | {ok: false, reason: string, fields?: string[]}>}
+ */
 export async function submitListing(payload) {
   if (!hasBackend) return NO_BACKEND;
+
   try {
-    const data = await request('/listings', { method: 'POST', body: JSON.stringify(payload) });
-    return { ok: Boolean(data && data.ok), id: (data && data.id) || null };
+    const { status, ok, data } = await requestRaw('/listings', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+
+    // Причину показываем человеку словами, поэтому коды разбираем здесь, а не в шторке.
+    if (status === 401) return { ok: false, reason: 'unauthorized' };
+    if (status === 422) return { ok: false, reason: 'invalid', fields: (data && data.fields) || [] };
+    if (status === 429) return { ok: false, reason: 'too-many' };
+    if (!ok || !data || !data.ok) return { ok: false, reason: 'server' };
+
+    return { ok: true, id: data.id, status: data.status || 'pending' };
   } catch {
     return { ok: false, reason: 'network' };
+  }
+}
+
+/** Объявления, поданные этим человеком, вместе со статусом модерации. */
+export async function getMyListings() {
+  if (!hasBackend) return { items: [], reason: 'no-backend' };
+
+  try {
+    const { status, ok, data } = await requestRaw('/my/listings');
+    if (status === 401) return { items: [], reason: 'unauthorized' };
+    if (!ok || !data) return { items: [], reason: 'server' };
+
+    return {
+      items: (Array.isArray(data.items) ? data.items : []).map((item) => ({
+        ...normalizeListing(item),
+        status: item.status || 'published',
+      })),
+    };
+  } catch {
+    return { items: [], reason: 'network' };
   }
 }
 

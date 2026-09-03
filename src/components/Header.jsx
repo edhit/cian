@@ -1,4 +1,4 @@
-import { ChevronDown, Heart, Search, SlidersHorizontal, X } from 'lucide-react';
+import { ChevronDown, Heart, Plus, Search, SlidersHorizontal, X } from 'lucide-react';
 import { cityLabel } from '../lib/schema.js';
 
 export function Header({
@@ -6,6 +6,7 @@ export function Header({
   onOpenCity,
   onOpenFilters,
   onOpenFavorites,
+  onOpenSubmit,
   activeFilters,
   favoritesCount,
   query,
@@ -27,6 +28,17 @@ export function Header({
             <ChevronDown size={18} className="shrink-0 text-label-2" />
           </button>
         </div>
+
+        {onOpenSubmit ? (
+          <button
+            type="button"
+            onClick={onOpenSubmit}
+            aria-label="Разместить объявление"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-card active:opacity-60"
+          >
+            <Plus size={20} className="text-label" />
+          </button>
+        ) : null}
 
         <button
           type="button"
