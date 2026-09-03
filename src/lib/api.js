@@ -115,9 +115,18 @@ export async function getListingsByIds(ids) {
   return list.map((id) => byId.get(id)).filter(Boolean);
 }
 
-/** Сколько объявлений в каждом городе. null, когда посчитать нельзя (режим Worker). */
+/** Сколько объявлений в каждом городе. null, когда посчитать не удалось. */
 export async function getCityCounts(deal) {
-  if (hasBackend) return null;
+  if (hasBackend) {
+    try {
+      const data = await request(`/facets?deal=${encodeURIComponent(deal || '')}`);
+      return data && data.cityCounts && typeof data.cityCounts === 'object' ? data.cityCounts : null;
+    } catch {
+      // Счётчики — подсказка, а не содержимое: молчим, но ленту не ломаем.
+      return null;
+    }
+  }
+
   const { items } = await loadLocal();
   const now = Date.now();
   const counts = {};

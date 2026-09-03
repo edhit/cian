@@ -1,0 +1,33 @@
+name = "realty-api"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+# База объявлений. Идентификатор подставить после `wrangler d1 create realty`.
+[[d1_databases]]
+binding = "DB"
+database_name = "realty"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+# Фотографии. Создать: `wrangler r2 bucket create realty-photos`.
+[[r2_buckets]]
+binding = "PHOTOS"
+bucket_name = "realty-photos"
+
+# Ночная уборка просроченных объявлений.
+[triggers]
+crons = ["0 3 * * *"]
+
+[vars]
+# Через запятую. Звёздочка означает «любой источник» — для отладки.
+ALLOWED_ORIGINS = "*"
+# Сколько секунд initData считается свежим.
+INIT_DATA_MAX_AGE = "86400"
+# Сколько разных людей должны пожаловаться, чтобы объявление скрылось.
+REPORT_THRESHOLD = "5"
+# Публичный адрес самого Worker — из него собираются ссылки на фотографии.
+PUBLIC_BASE = ""
+
+# Секреты задаются отдельно и в файл не попадают:
+#   wrangler secret put BOT_TOKEN      — токен бота, из него выводится ключ проверки initData
+#   wrangler secret put INGEST_TOKEN   — общий секрет для парсера
