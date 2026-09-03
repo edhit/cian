@@ -1,0 +1,913 @@
+{
+  "generatedAt": "2026-09-03T06:51:05.022Z",
+  "items": [
+    {
+      "id": "md-001",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "haram",
+      "address": "ул. Абу Бакр ас-Сиддик, 12",
+      "priceYear": 42000,
+      "deposit": 3500,
+      "commission": 2500,
+      "utilities": 250,
+      "rooms": 2,
+      "area": 78,
+      "floor": "3 из 6",
+      "features": [
+        "ac",
+        "elevator",
+        "kitchen"
+      ],
+      "description": "Пять минут пешком до Харама. Дом старый, но квартира после ремонта. Вода и электричество отдельным счётом.",
+      "contact": {
+        "telegram": "medina_rent",
+        "phone": "+966501234567"
+      },
+      "source": {
+        "chat": "Медина | Жильё",
+        "url": "https://t.me/medina_housing/1841"
+      },
+      "publishedAt": "2026-09-03T06:51:05.022Z",
+      "expiresAt": "2026-10-01T06:51:05.022Z",
+      "verified": true,
+      "photos": []
+    },
+    {
+      "id": "md-002",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "awali",
+      "address": "дом 44",
+      "priceYear": 28000,
+      "deposit": 2300,
+      "commission": 1400,
+      "utilities": 180,
+      "rooms": 1,
+      "area": 52,
+      "floor": "1 из 4",
+      "features": [
+        "ac",
+        "parking"
+      ],
+      "description": "Светлая квартира в тихом районе, рядом супермаркет и аптека. Сдаётся на год, договор оформляем официально.",
+      "contact": {
+        "telegram": "awali_flats",
+        "phone": ""
+      },
+      "source": {
+        "chat": "Медина | Жильё",
+        "url": "https://t.me/medina_housing/1839"
+      },
+      "publishedAt": "2026-09-03T06:51:05.022Z",
+      "expiresAt": "2026-10-03T06:51:05.022Z",
+      "verified": true,
+      "photos": []
+    },
+    {
+      "id": "md-003",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "quba",
+      "address": "рядом с мечетью Куба",
+      "priceYear": 36000,
+      "deposit": 3000,
+      "commission": 0,
+      "utilities": 200,
+      "rooms": 3,
+      "area": 104,
+      "floor": "2 из 5",
+      "features": [
+        "ac",
+        "balcony",
+        "washer"
+      ],
+      "description": "Рядом мечеть Куба и остановка автобуса. Двор закрытый, есть место для машины.",
+      "contact": {
+        "telegram": "quba_home",
+        "phone": "+966555001122"
+      },
+      "source": {
+        "chat": "Саудовская Аравия — аренда",
+        "url": "https://t.me/ksa_rent/902"
+      },
+      "publishedAt": "2026-09-02T06:51:05.022Z",
+      "expiresAt": "2026-09-28T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-004",
+      "dealType": "rent",
+      "furnished": false,
+      "city": "medina",
+      "district": "aziziyah",
+      "address": "дом 7",
+      "priceYear": 24000,
+      "deposit": 2000,
+      "commission": 1200,
+      "utilities": 150,
+      "rooms": 1,
+      "area": 45,
+      "floor": "4 из 4",
+      "features": [
+        "ac"
+      ],
+      "description": "Студия для одного. Без мебели, только кондиционер и кухонная стойка.",
+      "contact": {
+        "telegram": "",
+        "phone": "+966533445566"
+      },
+      "source": {
+        "chat": "Медина | Жильё",
+        "url": "https://t.me/medina_housing/1830"
+      },
+      "publishedAt": "2026-09-01T06:51:05.022Z",
+      "expiresAt": "2026-09-23T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-005",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "salam",
+      "address": "дом 19",
+      "priceYear": 54000,
+      "deposit": 4500,
+      "commission": 3000,
+      "utilities": 320,
+      "rooms": 4,
+      "area": 140,
+      "floor": "5 из 8",
+      "features": [
+        "ac",
+        "elevator",
+        "parking",
+        "wifi",
+        "family_only"
+      ],
+      "description": "Большая квартира для семьи. Четыре комнаты, две ванных, отдельная кухня.",
+      "contact": {
+        "telegram": "salam_estate",
+        "phone": "+966544332211"
+      },
+      "source": {
+        "chat": "Медина | Жильё",
+        "url": "https://t.me/medina_housing/1822"
+      },
+      "publishedAt": "2026-08-31T06:51:05.022Z",
+      "expiresAt": "2026-10-13T06:51:05.022Z",
+      "verified": true,
+      "photos": []
+    },
+    {
+      "id": "md-006",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "khalidiyah",
+      "address": "",
+      "priceYear": 31000,
+      "deposit": 2600,
+      "commission": 1500,
+      "utilities": 190,
+      "rooms": 2,
+      "area": 66,
+      "floor": "2 из 3",
+      "features": [
+        "ac",
+        "kitchen"
+      ],
+      "description": "Две комнаты, тихий подъезд, рядом школа.",
+      "contact": {
+        "telegram": "khalidiyah_rent",
+        "phone": "+966501110022"
+      },
+      "source": {
+        "chat": "Саудовская Аравия — аренда",
+        "url": "https://t.me/ksa_rent/880"
+      },
+      "publishedAt": "2026-08-30T06:51:05.022Z",
+      "expiresAt": "2026-09-21T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-007",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "haram",
+      "address": "Центральный район, 4",
+      "priceYear": 66000,
+      "deposit": 5500,
+      "commission": 4000,
+      "utilities": 400,
+      "rooms": 3,
+      "area": 96,
+      "floor": "7 из 12",
+      "features": [
+        "ac",
+        "elevator",
+        "wifi"
+      ],
+      "description": "Вид на Харам из окна. Дорого, но окна выходят прямо на площадь.",
+      "contact": {
+        "telegram": "haram_view",
+        "phone": "+966577889900"
+      },
+      "source": {
+        "chat": "Медина | Жильё",
+        "url": "https://t.me/medina_housing/1810"
+      },
+      "publishedAt": "2026-08-29T06:51:05.022Z",
+      "expiresAt": "2026-10-08T06:51:05.022Z",
+      "verified": true,
+      "photos": []
+    },
+    {
+      "id": "md-008",
+      "dealType": "rent",
+      "furnished": false,
+      "city": "medina",
+      "district": "other",
+      "address": "",
+      "priceYear": 19000,
+      "deposit": 0,
+      "commission": 0,
+      "utilities": 0,
+      "rooms": 1,
+      "area": 0,
+      "floor": "",
+      "features": [],
+      "description": "Комната в общей квартире. Пишите, расскажу подробнее.",
+      "contact": {
+        "telegram": "room_medina",
+        "phone": ""
+      },
+      "source": {
+        "chat": "Саудовская Аравия — аренда",
+        "url": "https://t.me/ksa_rent/861"
+      },
+      "publishedAt": "2026-08-28T06:51:05.022Z",
+      "expiresAt": "2026-09-15T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-009",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "awali",
+      "address": "вилла 8",
+      "priceYear": 88000,
+      "deposit": 7000,
+      "commission": 5000,
+      "utilities": 500,
+      "rooms": 4,
+      "area": 210,
+      "floor": "вилла",
+      "features": [
+        "ac",
+        "parking",
+        "kitchen",
+        "separate_entrance"
+      ],
+      "description": "Отдельная вилла с внутренним двором. Только для семьи, договор на год.",
+      "contact": {
+        "telegram": "awali_villa",
+        "phone": "+966500998877"
+      },
+      "source": {
+        "chat": "Медина | Жильё",
+        "url": "https://t.me/medina_housing/1801"
+      },
+      "publishedAt": "2026-08-27T06:51:05.022Z",
+      "expiresAt": "2026-10-18T06:51:05.022Z",
+      "verified": true,
+      "photos": []
+    },
+    {
+      "id": "md-010",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "quba",
+      "address": "дом 31",
+      "priceYear": 33000,
+      "deposit": 2800,
+      "commission": 1600,
+      "utilities": 210,
+      "rooms": 2,
+      "area": 71,
+      "floor": "3 из 5",
+      "features": [
+        "ac",
+        "balcony"
+      ],
+      "description": "Балкон во двор, дом без лифта.",
+      "contact": {
+        "telegram": "quba_rent2",
+        "phone": "+966512223344"
+      },
+      "source": {
+        "chat": "Медина | Жильё",
+        "url": "https://t.me/medina_housing/1795"
+      },
+      "publishedAt": "2026-08-26T06:51:05.022Z",
+      "expiresAt": "2026-09-25T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-011",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "salam",
+      "address": "дом 3",
+      "priceYear": 26000,
+      "deposit": 2200,
+      "commission": 1300,
+      "utilities": 170,
+      "rooms": 1,
+      "area": 48,
+      "floor": "1 из 6",
+      "features": [
+        "ac",
+        "elevator",
+        "women_only"
+      ],
+      "description": "Только для женщин. Отдельный вход, соседи — семьи.",
+      "contact": {
+        "telegram": "salam_women",
+        "phone": ""
+      },
+      "source": {
+        "chat": "Саудовская Аравия — аренда",
+        "url": "https://t.me/ksa_rent/845"
+      },
+      "publishedAt": "2026-08-25T06:51:05.022Z",
+      "expiresAt": "2026-09-18T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-012",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "aziziyah",
+      "address": "дом 22",
+      "priceYear": 39000,
+      "deposit": 3200,
+      "commission": 2000,
+      "utilities": 230,
+      "rooms": 3,
+      "area": 88,
+      "floor": "4 из 7",
+      "features": [
+        "ac",
+        "elevator",
+        "parking"
+      ],
+      "description": "Три комнаты, окна на две стороны.",
+      "contact": {
+        "telegram": "aziziyah_flats",
+        "phone": "+966566554433"
+      },
+      "source": {
+        "chat": "Медина | Жильё",
+        "url": "https://t.me/medina_housing/1780"
+      },
+      "publishedAt": "2026-08-23T06:51:05.022Z",
+      "expiresAt": "2026-10-03T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-013",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "khalidiyah",
+      "address": "дом 9",
+      "priceYear": 45000,
+      "deposit": 3800,
+      "commission": 2400,
+      "utilities": 260,
+      "rooms": 3,
+      "area": 99,
+      "floor": "2 из 4",
+      "features": [
+        "ac",
+        "kitchen",
+        "washer"
+      ],
+      "description": "Мебель есть, техника новая.",
+      "contact": {
+        "telegram": "kh_rent",
+        "phone": "+966599887766"
+      },
+      "source": {
+        "chat": "Медина | Жильё",
+        "url": "https://t.me/medina_housing/1774"
+      },
+      "publishedAt": "2026-08-21T06:51:05.022Z",
+      "expiresAt": "2026-09-29T06:51:05.022Z",
+      "verified": true,
+      "photos": []
+    },
+    {
+      "id": "md-014",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "haram",
+      "address": "ул. Салям, 55",
+      "priceYear": 58000,
+      "deposit": 4800,
+      "commission": 3400,
+      "utilities": 350,
+      "rooms": 2,
+      "area": 74,
+      "floor": "9 из 14",
+      "features": [
+        "ac",
+        "elevator",
+        "wifi",
+        "parking"
+      ],
+      "description": "Десять минут пешком до Харама, рядом стоянка автобусов.",
+      "contact": {
+        "telegram": "haram_apart",
+        "phone": "+966522334455"
+      },
+      "source": {
+        "chat": "Саудовская Аравия — аренда",
+        "url": "https://t.me/ksa_rent/830"
+      },
+      "publishedAt": "2026-08-19T06:51:05.022Z",
+      "expiresAt": "2026-09-23T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-015",
+      "dealType": "rent",
+      "furnished": false,
+      "city": "medina",
+      "district": "other",
+      "address": "Окраина, промзона",
+      "priceYear": 15000,
+      "deposit": 1200,
+      "commission": 0,
+      "utilities": 120,
+      "rooms": 1,
+      "area": 36,
+      "floor": "1 из 2",
+      "features": [],
+      "description": "Дёшево и далеко. Автобус ходит раз в час.",
+      "contact": {
+        "telegram": "cheap_medina",
+        "phone": ""
+      },
+      "source": {
+        "chat": "Саудовская Аравия — аренда",
+        "url": "https://t.me/ksa_rent/812"
+      },
+      "publishedAt": "2026-08-17T06:51:05.022Z",
+      "expiresAt": "2026-09-13T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-016",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "awali",
+      "address": "дом 61",
+      "priceYear": 35000,
+      "deposit": 2900,
+      "commission": 1700,
+      "utilities": 200,
+      "rooms": 2,
+      "area": 69,
+      "floor": "3 из 4",
+      "features": [
+        "ac",
+        "balcony",
+        "parking"
+      ],
+      "description": "Балкон, парковка во дворе, район спокойный.",
+      "contact": {
+        "telegram": "awali_two",
+        "phone": "+966588776655"
+      },
+      "source": {
+        "chat": "Медина | Жильё",
+        "url": "https://t.me/medina_housing/1760"
+      },
+      "publishedAt": "2026-08-15T06:51:05.022Z",
+      "expiresAt": "2026-09-27T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-017",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "quba",
+      "address": "дом 12",
+      "priceYear": 29000,
+      "deposit": 2400,
+      "commission": 1450,
+      "utilities": 185,
+      "rooms": 2,
+      "area": 63,
+      "floor": "2 из 4",
+      "features": [
+        "ac"
+      ],
+      "description": "Обычная двушка, мебель частично.",
+      "contact": {
+        "telegram": "quba12",
+        "phone": "+966511223344"
+      },
+      "source": {
+        "chat": "Медина | Жильё",
+        "url": "https://t.me/medina_housing/1752"
+      },
+      "publishedAt": "2026-08-13T06:51:05.022Z",
+      "expiresAt": "2026-09-19T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-018",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "salam",
+      "address": "дом 27",
+      "priceYear": 48000,
+      "deposit": 4000,
+      "commission": 2600,
+      "utilities": 280,
+      "rooms": 3,
+      "area": 107,
+      "floor": "6 из 9",
+      "features": [
+        "ac",
+        "elevator",
+        "wifi"
+      ],
+      "description": "Хороший этаж, лифт работает, интернет уже подключён.",
+      "contact": {
+        "telegram": "salam27",
+        "phone": "+966533221100"
+      },
+      "source": {
+        "chat": "Саудовская Аравия — аренда",
+        "url": "https://t.me/ksa_rent/800"
+      },
+      "publishedAt": "2026-08-11T06:51:05.022Z",
+      "expiresAt": "2026-10-01T06:51:05.022Z",
+      "verified": true,
+      "photos": []
+    },
+    {
+      "id": "md-019",
+      "dealType": "rent",
+      "furnished": false,
+      "city": "medina",
+      "district": "aziziyah",
+      "address": "дом 40",
+      "priceYear": 22000,
+      "deposit": 1800,
+      "commission": 1100,
+      "utilities": 140,
+      "rooms": 1,
+      "area": 42,
+      "floor": "5 из 5",
+      "features": [
+        "ac"
+      ],
+      "description": "Верхний этаж, летом жарко. Зато дёшево.",
+      "contact": {
+        "telegram": "az40",
+        "phone": ""
+      },
+      "source": {
+        "chat": "Медина | Жильё",
+        "url": "https://t.me/medina_housing/1740"
+      },
+      "publishedAt": "2026-08-09T06:51:05.022Z",
+      "expiresAt": "2026-09-17T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-020",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "khalidiyah",
+      "address": "дом 15",
+      "priceYear": 41000,
+      "deposit": 3400,
+      "commission": 2100,
+      "utilities": 240,
+      "rooms": 3,
+      "area": 92,
+      "floor": "1 из 3",
+      "features": [
+        "ac",
+        "kitchen",
+        "separate_entrance"
+      ],
+      "description": "Первый этаж, отдельный вход со двора.",
+      "contact": {
+        "telegram": "kh15",
+        "phone": "+966577665544"
+      },
+      "source": {
+        "chat": "Медина | Жильё",
+        "url": "https://t.me/medina_housing/1731"
+      },
+      "publishedAt": "2026-08-07T06:51:05.022Z",
+      "expiresAt": "2026-09-22T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-021",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "haram",
+      "address": "ул. Кинг Фахд",
+      "priceYear": 52000,
+      "deposit": 4300,
+      "commission": 2900,
+      "utilities": 300,
+      "rooms": 2,
+      "area": 80,
+      "floor": "8 из 10",
+      "features": [
+        "ac",
+        "elevator",
+        "parking"
+      ],
+      "description": "Дом новый, охрана на входе.",
+      "contact": {
+        "telegram": "fahd_rent",
+        "phone": "+966544556677"
+      },
+      "source": {
+        "chat": "Саудовская Аравия — аренда",
+        "url": "https://t.me/ksa_rent/790"
+      },
+      "publishedAt": "2026-08-05T06:51:05.022Z",
+      "expiresAt": "2026-09-24T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-022",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "medina",
+      "district": "awali",
+      "address": "Просрочено, не показывать",
+      "priceYear": 20000,
+      "deposit": 0,
+      "commission": 0,
+      "utilities": 0,
+      "rooms": 1,
+      "area": 40,
+      "floor": "",
+      "features": [],
+      "description": "Это объявление истекло вчера.",
+      "contact": {
+        "telegram": "expired",
+        "phone": ""
+      },
+      "source": {
+        "chat": "Медина | Жильё",
+        "url": "https://t.me/medina_housing/1000"
+      },
+      "publishedAt": "2026-07-30T06:51:05.022Z",
+      "expiresAt": "2026-09-02T06:51:05.022Z",
+      "verified": true,
+      "photos": []
+    },
+    {
+      "id": "md-023",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "makkah",
+      "district": "aziziyah",
+      "address": "дом 5",
+      "priceYear": 60000,
+      "deposit": 5000,
+      "commission": 3600,
+      "utilities": 340,
+      "rooms": 2,
+      "area": 76,
+      "floor": "4 из 9",
+      "features": [
+        "ac",
+        "elevator",
+        "parking"
+      ],
+      "description": "Автобус до Харама ходит круглосуточно.",
+      "contact": {
+        "telegram": "makkah_rent",
+        "phone": "+966501010101"
+      },
+      "source": {
+        "chat": "Мекка | Жильё",
+        "url": "https://t.me/makkah_housing/512"
+      },
+      "publishedAt": "2026-09-02T06:51:05.022Z",
+      "expiresAt": "2026-10-03T06:51:05.022Z",
+      "verified": true,
+      "photos": []
+    },
+    {
+      "id": "md-024",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "makkah",
+      "district": "misfalah",
+      "address": "",
+      "priceYear": 47000,
+      "deposit": 3900,
+      "commission": 2500,
+      "utilities": 270,
+      "rooms": 1,
+      "area": 50,
+      "floor": "2 из 6",
+      "features": [
+        "ac",
+        "elevator"
+      ],
+      "description": "Пешком до Харама минут двадцать.",
+      "contact": {
+        "telegram": "misfalah_flat",
+        "phone": ""
+      },
+      "source": {
+        "chat": "Мекка | Жильё",
+        "url": "https://t.me/makkah_housing/508"
+      },
+      "publishedAt": "2026-08-30T06:51:05.022Z",
+      "expiresAt": "2026-09-28T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-025",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "jeddah",
+      "district": "rawdah",
+      "address": "дом 88",
+      "priceYear": 55000,
+      "deposit": 4600,
+      "commission": 3000,
+      "utilities": 310,
+      "rooms": 3,
+      "area": 118,
+      "floor": "5 из 10",
+      "features": [
+        "ac",
+        "elevator",
+        "parking",
+        "wifi"
+      ],
+      "description": "Рядом море и торговый центр.",
+      "contact": {
+        "telegram": "jeddah_home",
+        "phone": "+966502020202"
+      },
+      "source": {
+        "chat": "Джидда | Аренда",
+        "url": "https://t.me/jeddah_rent/301"
+      },
+      "publishedAt": "2026-09-01T06:51:05.022Z",
+      "expiresAt": "2026-10-06T06:51:05.022Z",
+      "verified": true,
+      "photos": []
+    },
+    {
+      "id": "md-026",
+      "dealType": "rent",
+      "furnished": true,
+      "city": "riyadh",
+      "district": "olaya",
+      "address": "башня 3",
+      "priceYear": 72000,
+      "deposit": 6000,
+      "commission": 4200,
+      "utilities": 420,
+      "rooms": 2,
+      "area": 85,
+      "floor": "15 из 22",
+      "features": [
+        "ac",
+        "elevator",
+        "parking",
+        "wifi"
+      ],
+      "description": "Деловой центр, до метро пять минут.",
+      "contact": {
+        "telegram": "riyadh_flats",
+        "phone": "+966503030303"
+      },
+      "source": {
+        "chat": "Эр-Рияд | Жильё",
+        "url": "https://t.me/riyadh_housing/144"
+      },
+      "publishedAt": "2026-08-31T06:51:05.022Z",
+      "expiresAt": "2026-10-04T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    },
+    {
+      "id": "md-027",
+      "dealType": "sale",
+      "city": "medina",
+      "district": "quba",
+      "address": "новый комплекс",
+      "priceYear": 850000,
+      "deposit": 0,
+      "commission": 25000,
+      "utilities": 0,
+      "rooms": 4,
+      "area": 165,
+      "floor": "6 из 10",
+      "furnished": false,
+      "features": [
+        "ac",
+        "elevator",
+        "parking"
+      ],
+      "description": "Квартира в новом доме, сдача в этом году. Оформление через агентство.",
+      "contact": {
+        "telegram": "medina_sale",
+        "phone": "+966504040404"
+      },
+      "source": {
+        "chat": "Недвижимость КСА",
+        "url": "https://t.me/ksa_estate/77"
+      },
+      "publishedAt": "2026-08-28T06:51:05.022Z",
+      "expiresAt": "2026-11-02T06:51:05.022Z",
+      "verified": true,
+      "photos": []
+    },
+    {
+      "id": "md-028",
+      "dealType": "sale",
+      "city": "jeddah",
+      "district": "hamra",
+      "address": "",
+      "priceYear": 1250000,
+      "deposit": 0,
+      "commission": 0,
+      "utilities": 0,
+      "rooms": 5,
+      "area": 240,
+      "floor": "вилла",
+      "furnished": false,
+      "features": [
+        "ac",
+        "parking",
+        "kitchen"
+      ],
+      "description": "Вилла с участком. Документы готовы.",
+      "contact": {
+        "telegram": "",
+        "phone": "+966505050505"
+      },
+      "source": {
+        "chat": "Недвижимость КСА",
+        "url": "https://t.me/ksa_estate/70"
+      },
+      "publishedAt": "2026-08-24T06:51:05.022Z",
+      "expiresAt": "2026-12-02T06:51:05.022Z",
+      "verified": false,
+      "photos": []
+    }
+  ]
+}

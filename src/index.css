@@ -1,0 +1,108 @@
+@import 'tailwindcss';
+
+:root {
+  --bg: #f2f2f7;
+  --card: #ffffff;
+  --label: #1c1c1e;
+  --label-2: #6c6c70;
+  --label-3: #a5a5aa;
+  --separator: #e4e4e9;
+  --fill: #efeff4;
+  --accent: #1b7f5a;
+  --accent-2: #e8f3ee;
+  --danger: #ff3b30;
+  --warning: #ff9500;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --card: #1c1c1e;
+    --label: #ffffff;
+    --label-2: #9e9ea4;
+    --label-3: #6a6a70;
+    --separator: #2c2c2e;
+    --fill: #2c2c2e;
+    --accent: #30d18b;
+    --accent-2: #17342a;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-card: var(--card);
+  --color-label: var(--label);
+  --color-label-2: var(--label-2);
+  --color-label-3: var(--label-3);
+  --color-separator: var(--separator);
+  --color-fill: var(--fill);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+
+  --text-body: 17px;
+  --text-body--line-height: 22px;
+  --text-caption: 13px;
+  --text-caption--line-height: 17px;
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+html {
+  background-color: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--label);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 22px;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+/* Цифры не должны прыгать при смене цены в одинаковых по смыслу строках. */
+.nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Горизонтальные ленты чипов: скроллбар в нативном приложении не рисуют. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.skeleton {
+  animation: shimmer 1.4s ease-in-out infinite;
+  background-color: var(--fill);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
