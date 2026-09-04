@@ -65,7 +65,7 @@ function Picker({ pool, selected, onToggle }) {
   );
 }
 
-export function CompareSheet({ open, onClose, ids, notes, onOpen }) {
+export function CompareSheet({ open, onClose, ids, onOpen }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [deal, setDeal] = useState('rent');
@@ -105,8 +105,8 @@ export function CompareSheet({ open, onClose, ids, notes, onOpen }) {
     [pool, selected],
   );
 
-  const { rows } = useMemo(() => buildComparison(chosen, notes), [chosen, notes]);
-  const verdict = useMemo(() => buildVerdict(chosen, notes), [chosen, notes]);
+  const { rows } = useMemo(() => buildComparison(chosen), [chosen]);
+  const verdict = useMemo(() => buildVerdict(chosen), [chosen]);
 
   const switchDeal = (next) => {
     setDeal(next);

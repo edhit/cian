@@ -120,20 +120,6 @@ test('вывода нет, когда сравнивать нечего или �
   assert.equal(same.find((l) => l.key === 'cheapest'), undefined);
 });
 
-test('оценка человека попадает и в строки, и в выводы', () => {
-  const a = make({ id: 'a' });
-  const b = make({ id: 'b' });
-  const notes = { a: { rating: 5, text: 'Понравилась' }, b: { rating: 2, text: '' } };
-
-  const { rows } = buildComparison([a, b], notes);
-  assert.equal(row(rows, 'rating').values[0].text, '5 из 5');
-  assert.equal(row(rows, 'rating').values[0].best, true);
-  assert.equal(row(rows, 'note').values[0].text, 'Понравилась');
-  assert.equal(row(rows, 'note').values[1].text, '—');
-
-  assert.equal(buildVerdict([a, b], notes).find((l) => l.key === 'rating').id, 'a');
-});
-
 test('битое объявление не роняет сравнение', () => {
   const broken = normalizeListing({ id: 'x', city: 'medina' });
   const good = make({ id: 'a' });

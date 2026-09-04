@@ -13,7 +13,6 @@ import { MyListingsSheet } from './components/MyListingsSheet.jsx';
 import { CompareSheet } from './components/CompareSheet.jsx';
 import { useListings } from './hooks/useListings.js';
 import { useFavorites } from './hooks/useFavorites.js';
-import { useNotes } from './hooks/useNotes.js';
 import { useDebounced } from './hooks/useDebounced.js';
 import { getCityCounts, hasBackend } from './lib/api.js';
 import { CITIES, EMPTY_FILTERS, districtsOf, countActiveFilters, makeFilters } from './lib/schema.js';
@@ -34,7 +33,6 @@ export default function App() {
   const [submittedAt, setSubmittedAt] = useState(0);
 
   const favorites = useFavorites();
-  const notes = useNotes();
   const debouncedQuery = useDebounced(query, 350);
 
   // Восстановление настроек. Пока не загрузились — фильтры не сохраняем,
@@ -240,7 +238,6 @@ export default function App() {
         open={sheets.includes('compare')}
         onClose={() => closeSheet('compare')}
         ids={favorites.ids}
-        notes={notes.notes}
         onOpen={openCard}
       />
 
@@ -250,8 +247,6 @@ export default function App() {
         listing={openListing}
         favorite={openListing ? favorites.has(openListing.id) : false}
         onToggleFavorite={favorites.toggle}
-        note={openListing ? notes.get(openListing.id) : null}
-        onNoteChange={notes.update}
       />
     </div>
   );

@@ -198,25 +198,6 @@ const METRICS = [
     value: (l) => l.publishedAt || MISSING,
     format: relativeDate,
   },
-  {
-    key: 'rating',
-    label: 'Ваша оценка',
-    deals: ['rent', 'sale'],
-    better: 'high',
-    value: (l, notes) => {
-      const rating = notes[l.id] && notes[l.id].rating;
-      return rating > 0 ? rating : MISSING;
-    },
-    format: (v) => `${v} из 5`,
-  },
-  {
-    key: 'note',
-    label: 'Ваша заметка',
-    deals: ['rent', 'sale'],
-    better: null,
-    value: (l, notes) => (notes[l.id] && notes[l.id].text) || MISSING,
-    format: (v) => v,
-  },
 ];
 
 function bestIndexes(values, better) {
@@ -238,15 +219,14 @@ function bestIndexes(values, better) {
 
 /**
  * @param {object[]} items — сравниваемые объявления, все одного типа сделки
- * @param {object} notes — { [id]: { text, rating } }
  * @returns {{rows: object[], deal: string}}
  */
-export function buildComparison(items, notes = {}) {
+export function buildComparison(items) {
   const deal = items.length > 0 ? items[0].dealType : 'rent';
 
   const rows = METRICS.filter((metric) => metric.deals.includes(deal)).map((metric) => {
     const values = items.map((item) => {
-      const raw = metric.value(item, notes);
+      const raw = metric.value(item);
       const missing = raw === MISSING || (raw === 0 && !metric.zeroIsValue);
       return {
         id: item.id,
@@ -293,7 +273,7 @@ function shortName(item) {
  * Короткие выводы вместо таблицы, которую нужно читать глазами.
  * Каждый вывод — только когда победитель один и он действительно отличается.
  */
-export function buildVerdict(items, notes = {}) {
+export function buildVerdict(items) {
   if (items.length < 2) return [];
   const deal = items[0].dealType;
   const lines = [];
@@ -348,18 +328,6 @@ export function buildVerdict(items, notes = {}) {
       key: 'space',
       id: space.item.id,
       text: `Просторнее всех — ${shortName(space.item)}: ${formatArea(space.item.area)}.`,
-    });
-  }
-
-  const rated = winner(items, (l) => {
-    const rating = notes[l.id] && notes[l.id].rating;
-    return rating > 0 ? rating : NaN;
-  }, 'high');
-  if (rated) {
-    lines.push({
-      key: 'rating',
-      id: rated.item.id,
-      text: `Выше всех вы оценили ${shortName(rated.item)} — ${rated.value} из 5.`,
     });
   }
 
