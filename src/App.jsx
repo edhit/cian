@@ -10,8 +10,10 @@ import { ListingSheet } from './components/ListingSheet.jsx';
 import { FavoritesSheet } from './components/FavoritesSheet.jsx';
 import { SubmitSheet } from './components/SubmitSheet.jsx';
 import { MyListingsSheet } from './components/MyListingsSheet.jsx';
+import { CompareSheet } from './components/CompareSheet.jsx';
 import { useListings } from './hooks/useListings.js';
 import { useFavorites } from './hooks/useFavorites.js';
+import { useNotes } from './hooks/useNotes.js';
 import { useDebounced } from './hooks/useDebounced.js';
 import { getCityCounts, hasBackend } from './lib/api.js';
 import { CITIES, EMPTY_FILTERS, districtsOf, countActiveFilters, makeFilters } from './lib/schema.js';
@@ -32,6 +34,7 @@ export default function App() {
   const [submittedAt, setSubmittedAt] = useState(0);
 
   const favorites = useFavorites();
+  const notes = useNotes();
   const debouncedQuery = useDebounced(query, 350);
 
   // Восстановление настроек. Пока не загрузились — фильтры не сохраняем,
@@ -213,6 +216,7 @@ export default function App() {
         isFavorite={favorites.has}
         onToggleFavorite={favorites.toggle}
         onOpen={openCard}
+        onCompare={() => openSheet('compare')}
       />
 
       <SubmitSheet
@@ -232,12 +236,22 @@ export default function App() {
         onOpen={openCard}
       />
 
+      <CompareSheet
+        open={sheets.includes('compare')}
+        onClose={() => closeSheet('compare')}
+        ids={favorites.ids}
+        notes={notes.notes}
+        onOpen={openCard}
+      />
+
       <ListingSheet
         open={sheets.includes('listing')}
         onClose={() => closeSheet('listing')}
         listing={openListing}
         favorite={openListing ? favorites.has(openListing.id) : false}
         onToggleFavorite={favorites.toggle}
+        note={openListing ? notes.get(openListing.id) : null}
+        onNoteChange={notes.update}
       />
     </div>
   );

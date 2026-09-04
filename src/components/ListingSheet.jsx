@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BadgeCheck, ExternalLink, Flag, Heart, MessageCircle, Phone, TriangleAlert } from 'lucide-react';
 import { Sheet } from './Sheet.jsx';
+import { NoteEditor } from './NoteEditor.jsx';
 import { Photo } from './Photo.jsx';
 import { getListing, hasBackend, reportListing } from '../lib/api.js';
 import { cityLabel, districtLabel, featureLabel, monthlyRent, trueMonthly } from '../lib/schema.js';
@@ -60,7 +61,7 @@ function Photos({ photos }) {
   );
 }
 
-export function ListingSheet({ open, onClose, listing: initial, favorite, onToggleFavorite }) {
+export function ListingSheet({ open, onClose, listing: initial, favorite, onToggleFavorite, note, onNoteChange }) {
   const [listing, setListing] = useState(initial);
   const [reported, setReported] = useState(false);
 
@@ -171,6 +172,8 @@ export function ListingSheet({ open, onClose, listing: initial, favorite, onTogg
             </p>
           </section>
         ) : null}
+
+        {note ? <NoteEditor note={note} onChange={(patch) => onNoteChange(listing.id, patch)} /> : null}
 
         <div className="flex items-start gap-2.5 rounded-[10px] bg-accent-2 px-4 py-3">
           <TriangleAlert size={18} className="mt-0.5 shrink-0 text-warning" aria-hidden="true" />

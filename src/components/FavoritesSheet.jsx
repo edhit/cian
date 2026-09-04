@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Heart } from 'lucide-react';
+import { Heart, Scale } from 'lucide-react';
 import { Sheet } from './Sheet.jsx';
 import { ListingList } from './ListingCard.jsx';
 import { ListSkeleton } from './Skeletons.jsx';
 import { getListingsByIds } from '../lib/api.js';
 import { isExpired } from '../lib/schema.js';
 
-export function FavoritesSheet({ open, onClose, ids, isFavorite, onToggleFavorite, onOpen }) {
+export function FavoritesSheet({ open, onClose, ids, isFavorite, onToggleFavorite, onOpen, onCompare }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -48,6 +48,17 @@ export function FavoritesSheet({ open, onClose, ids, isFavorite, onToggleFavorit
           </div>
         ) : (
           <>
+            {items.length >= 2 ? (
+              <button
+                type="button"
+                onClick={onCompare}
+                className="mb-3 flex w-full items-center justify-center gap-2 rounded-[10px] bg-accent py-3 text-body font-medium text-white active:opacity-80"
+              >
+                <Scale size={18} />
+                Сравнить
+              </button>
+            ) : null}
+
             <ListingList
               items={items}
               isFavorite={isFavorite}
