@@ -24,6 +24,19 @@ wrangler deploy
 - `PUBLIC_BASE` — адрес самого Worker, из него собираются ссылки на фотографии;
 - `ALLOWED_ORIGINS` — адрес фронта на Pages вместо звёздочки.
 
+```toml
+ALLOWED_ORIGINS = "https://имя-проекта.pages.dev"   # правильно
+ALLOWED_ORIGINS = "https://имя-проекта.pages.dev/"  # тоже сработает, слэш срезается
+```
+
+Заголовок `Origin`, который присылает браузер, — это всегда «схема://хост», без
+косой черты и без пути. Раньше строгое сравнение с адресом из настроек молча роняло
+весь фронт: браузер не получал `Access-Control-Allow-Origin` и показывал это как
+обрыв связи. Теперь адреса приводятся к одному виду с обеих сторон, а несовпадение
+пишется в лог — видно через `wrangler tail`.
+
+Несколько адресов перечисляются через запятую (например, домен Pages и свой домен).
+
 Фронт собирается с `VITE_API_BASE=https://realty-api.<аккаунт>.workers.dev`.
 
 ## Разработка и тесты
@@ -39,7 +52,10 @@ npm test                   # 30 тестов по живому Worker, в сос
 ```
 BOT_TOKEN=123456:TEST-BOT-TOKEN-FOR-LOCAL-ONLY
 INGEST_TOKEN=local-ingest-secret
+ALLOWED_ORIGINS=https://cianksa.pages.dev/
 ```
+
+Значения из `.dev.vars` перекрывают `[vars]` из `wrangler.toml` только локально.
 
 ## Контракт
 

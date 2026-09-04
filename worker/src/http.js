@@ -1,8 +1,34 @@
+/**
+ * Заголовок Origin — это всегда «схема://хост[:порт]», без косой черты в конце
+ * и без пути. В настройках же почти всегда пишут адрес сайта целиком, вместе
+ * с завершающим слэшем, и строгое сравнение молча ломает весь фронт.
+ */
+export function normalizeOrigin(value) {
+  const raw = String(value || '').trim();
+  if (!raw || raw === '*') return raw;
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return raw.replace(/\/+$/, '');
+  }
+}
+
 export function corsHeaders(request, env) {
-  const allowed = (env.ALLOWED_ORIGINS || '*').split(',').map((s) => s.trim()).filter(Boolean);
-  const origin = request.headers.get('Origin') || '';
+  const allowed = (env.ALLOWED_ORIGINS || '*')
+    .split(',')
+    .map(normalizeOrigin)
+    .filter(Boolean);
+  const origin = normalizeOrigin(request.headers.get('Origin'));
   const anyOrigin = allowed.includes('*');
   const allow = anyOrigin ? '*' : allowed.includes(origin) ? origin : '';
+
+  // Браузер покажет это как обрыв связи, поэтому причину пишем в лог:
+  // без неё отладка сводится к угадыванию. Смотреть через `wrangler tail`.
+  if (origin && !allow) {
+    console.warn(
+      `CORS: origin ${origin} не входит в ALLOWED_ORIGINS (${allowed.join(', ') || 'пусто'})`,
+    );
+  }
 
   const headers = {
     'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',

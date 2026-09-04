@@ -4,7 +4,40 @@
 import { normalizeListing, queryListings } from './schema.js';
 import { getInitData } from './telegram.js';
 
-const BASE = (import.meta.env.VITE_API_BASE || '').trim().replace(/\/+$/, '');
+/**
+ * Адрес Worker из переменной сборки. Значение приходит из .env или из настроек
+ * Pages, где легко оставить кавычки или лишний пробел, — такие символы срезаем,
+ * иначе fetch падает, а человек видит «проверьте соединение».
+ */
+function readApiBase() {
+  const raw = String(import.meta.env.VITE_API_BASE || '')
+    .trim()
+    // Кавычки любых видов, включая «умные» и ¨ с нестандартных раскладок.
+    .replace(/^["'`«»„“”‘’¨]+|["'`«»„“”‘’¨]+$/g, '')
+    .trim()
+    .replace(/\/+$/, '');
+
+  if (!raw) return '';
+
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') throw new Error('protocol');
+    return raw;
+  } catch {
+    // Разбирать нечего: адрес неверен. Молча делать вид, что бэкенда нет, нельзя —
+    // поэтому громко пишем в консоль и работаем в режиме локального файла.
+    console.error(
+      `VITE_API_BASE не похож на адрес: ${JSON.stringify(import.meta.env.VITE_API_BASE)}. ` +
+        'Ожидается https://имя.workers.dev без кавычек. Пока читаем listings.json.',
+    );
+    return '';
+  }
+}
+
+const BASE = readApiBase();
+
+/** Адрес бэкенда после разбора — пустая строка означает работу из файла. */
+export const apiBase = BASE;
 
 /** Есть ли куда писать. Интерфейс прячет кнопки записи, когда бэкенда нет. */
 export const hasBackend = Boolean(BASE);
@@ -26,18 +59,43 @@ function buildHeaders(options) {
   };
 }
 
+/**
+ * Браузер не показывает разницу между «сервер недоступен» и «CORS не пропустил»:
+ * в обоих случаях это одинаковый TypeError. Подсказку пишем в консоль — иначе
+ * забытый ALLOWED_ORIGINS выглядит как проблема со связью.
+ */
+function explainFetchFailure(path, cause) {
+  const online = typeof navigator === 'undefined' || navigator.onLine !== false;
+  console.error(
+    `Запрос ${BASE}${path} не выполнен: ${cause && cause.message}. ` +
+      (online
+        ? 'Сеть на месте — проверьте ALLOWED_ORIGINS у Worker: в нём должен быть адрес ' +
+          `${typeof location === 'undefined' ? 'этого сайта' : location.origin} и адрес самого Worker должен отвечать.`
+        : 'Похоже, устройство не в сети.'),
+  );
+}
+
 /** Запрос, который не бросает на 4xx: вызывающему нужен разбор причины. */
 async function requestRaw(path, options = {}) {
-  const response = await fetch(`${BASE}${path}`, { ...options, headers: buildHeaders(options) });
+  let response;
+  try {
+    response = await fetch(`${BASE}${path}`, { ...options, headers: buildHeaders(options) });
+  } catch (cause) {
+    explainFetchFailure(path, cause);
+    throw cause;
+  }
   const data = await response.json().catch(() => null);
   return { status: response.status, ok: response.ok, data };
 }
 
 async function request(path, options = {}) {
-  const response = await fetch(`${BASE}${path}`, {
-    ...options,
-    headers: buildHeaders(options),
-  });
+  let response;
+  try {
+    response = await fetch(`${BASE}${path}`, { ...options, headers: buildHeaders(options) });
+  } catch (cause) {
+    explainFetchFailure(path, cause);
+    throw cause;
+  }
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return response.json();
 }

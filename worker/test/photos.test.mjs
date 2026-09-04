@@ -55,10 +55,9 @@ test('отсутствующая фотография даёт 404', async () =>
 test('CORS: предварительный запрос разрешён', async () => {
   const res = await fetch(`${BASE}/listings`, {
     method: 'OPTIONS',
-    headers: { Origin: 'https://example.pages.dev', 'Access-Control-Request-Method': 'POST' },
+    headers: { Origin: 'https://cianksa.pages.dev', 'Access-Control-Request-Method': 'POST' },
   });
   assert.equal(res.status, 204);
-  assert.equal(res.headers.get('Access-Control-Allow-Origin'), '*');
   assert.match(res.headers.get('Access-Control-Allow-Headers'), /Authorization/);
 });
 
@@ -66,4 +65,25 @@ test('неизвестный маршрут даёт 404, а не пятисот
   const res = await fetch(`${BASE}/чего-то-нет`);
   assert.equal(res.status, 404);
   assert.equal((await res.json()).error, 'not-found');
+});
+
+test('CORS: адрес с косой чертой в конце всё равно совпадает', async () => {
+  // Origin от браузера — «схема://хост», а в настройках почти всегда пишут
+  // адрес сайта целиком, со слэшем. Строгое сравнение ломало бы весь фронт.
+  const { normalizeOrigin } = await import('../src/http.js');
+  assert.equal(normalizeOrigin('https://cianksa.pages.dev/'), 'https://cianksa.pages.dev');
+  assert.equal(normalizeOrigin('  https://cianksa.pages.dev  '), 'https://cianksa.pages.dev');
+  assert.equal(normalizeOrigin('https://cianksa.pages.dev/app/'), 'https://cianksa.pages.dev');
+  assert.equal(normalizeOrigin('*'), '*');
+  assert.equal(normalizeOrigin(''), '');
+  assert.equal(normalizeOrigin(null), '');
+});
+
+test('CORS: настроенный источник получает заголовок', async () => {
+  // Соответствие адреса со слэшем на конце проверяется юнит-тестом normalizeOrigin
+  // выше: подставить сюда свой ALLOWED_ORIGINS тест не может — это настройка сервера.
+  const origin = 'https://cianksa.pages.dev';
+  const res = await fetch(`${BASE}/listings?limit=1`, { headers: { Origin: origin } });
+  const allow = res.headers.get('Access-Control-Allow-Origin');
+  assert.ok(allow === '*' || allow === origin, `неожиданный Access-Control-Allow-Origin: ${allow}`);
 });
