@@ -12,6 +12,7 @@ import { FEED_ORDER, feedConditions, listingToRow, rowToListing, upsertStatement
 import { corsHeaders, error, json, readJson } from './http.js';
 import { normalizeListing, validateSubmission } from './schema.js';
 import { handleWebhook, isTrusted, matchesTrusted, notifyAdmins, trustedSet } from './moderation.js';
+import { adminIds } from './telegram.js';
 
 const MAX_LIMIT = 50;
 const DEFAULT_LIMIT = 20;
@@ -58,12 +59,27 @@ async function missingTables(env) {
 
 /** Что настроено, а что нет. Значения секретов наружу не отдаются — только факт. */
 async function health(request, env) {
+  const admins = adminIds(env || {});
+
   const checks = {
     ok: true,
     db: 'нет привязки',
     r2: 'нет привязки',
     botToken: Boolean(env && env.BOT_TOKEN),
     ingestToken: Boolean(env && env.INGEST_TOKEN),
+    // Модерация молчит, если нет хотя бы одного из трёх: токена, админов, секрета вебхука.
+    webhookSecret: Boolean(env && env.TELEGRAM_WEBHOOK_SECRET),
+    admins: admins.length,
+    moderation:
+      admins.length === 0
+        ? 'нет ADMIN_IDS — заявки некому проверять'
+        : !(env && env.BOT_TOKEN)
+          ? 'нет BOT_TOKEN'
+          : !(env && env.TELEGRAM_WEBHOOK_SECRET)
+            ? 'нет TELEGRAM_WEBHOOK_SECRET — кнопки в боте работать не будут'
+            : 'ок',
+    // Пустое значение не ошибка: ссылки на фото соберутся из адреса запроса.
+    publicBase: String((env && env.PUBLIC_BASE) || '') || 'из адреса запроса',
     allowedOrigins: String((env && env.ALLOWED_ORIGINS) || '*'),
   };
 
@@ -98,6 +114,9 @@ async function health(request, env) {
     } catch (cause) {
       checks.r2 = `ошибка: ${(cause && cause.message) || cause}`;
     }
+  } else {
+    checks.r2 =
+      'нет привязки — создайте бакет (wrangler r2 bucket create realty-photos) и разверните заново';
   }
 
   return json(checks, { request, env, status: checks.ok ? 200 : 503 });

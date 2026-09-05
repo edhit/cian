@@ -1,13 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { after, before } from 'node:test';
 import { api, initDataFor, uid, rid, INGEST_TOKEN, BASE } from './helpers.mjs';
+import { startFakeTelegram } from './fake-telegram.mjs';
 
-const TELEGRAM = 'http://localhost:8899';
 const WEBHOOK_SECRET = 'local-webhook-secret';
 const ADMIN = 555001;
 
-const botCalls = async () => (await fetch(`${TELEGRAM}/__calls`)).json();
-const resetBot = () => fetch(`${TELEGRAM}/__reset`);
+// Свой Bot API поднимается вместе с тестами: внешних зависимостей у прогона нет.
+let telegram;
+before(async () => {
+  telegram = startFakeTelegram();
+  await telegram.ready;
+});
+after(() => telegram && telegram.close());
+
+const botCalls = async () => telegram.calls();
+const resetBot = async () => telegram.reset();
 
 const valid = (patch = {}) => ({
   dealType: 'rent', city: 'medina', district: 'quba', address: 'дом 1',

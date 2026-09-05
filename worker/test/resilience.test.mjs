@@ -131,3 +131,35 @@ test('полная схема считается здоровой', async () => 
   assert.equal(res.status, 200);
   assert.equal((await res.json()).db, 'ок');
 });
+
+test('/health объясняет, чего не хватает модерации', async () => {
+  const withoutAdmins = await (await call('/health', { env: { BOT_TOKEN: 'x', TELEGRAM_WEBHOOK_SECRET: 'y' } })).json();
+  assert.equal(withoutAdmins.admins, 0);
+  assert.match(withoutAdmins.moderation, /ADMIN_IDS/);
+
+  const withoutSecret = await (await call('/health', { env: { BOT_TOKEN: 'x', ADMIN_IDS: '1, 2' } })).json();
+  assert.equal(withoutSecret.admins, 2);
+  assert.equal(withoutSecret.webhookSecret, false);
+  assert.match(withoutSecret.moderation, /TELEGRAM_WEBHOOK_SECRET/);
+
+  const ready = await (await call('/health', {
+    env: { BOT_TOKEN: 'x', ADMIN_IDS: '240400422', TELEGRAM_WEBHOOK_SECRET: 'z' },
+  })).json();
+  assert.equal(ready.moderation, 'ок');
+  // Значения секретов наружу не уходят, только факт.
+  assert.ok(!JSON.stringify(ready).includes('z"') && !JSON.stringify(ready).includes('BOT_TOKEN'));
+});
+
+test('/health подсказывает, что делать с отсутствующим бакетом', async () => {
+  const body = await (await call('/health')).json();
+  assert.match(body.r2, /создайте бакет/);
+  assert.match(body.r2, /r2 bucket create/);
+});
+
+test('/health не выдаёт значение публичного адреса за настроенное', async () => {
+  const empty = await (await call('/health')).json();
+  assert.equal(empty.publicBase, 'из адреса запроса');
+
+  const set = await (await call('/health', { env: { PUBLIC_BASE: 'https://api.example' } })).json();
+  assert.equal(set.publicBase, 'https://api.example');
+});
