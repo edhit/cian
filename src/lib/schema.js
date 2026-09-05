@@ -10,13 +10,13 @@
  * с Worker, поэтому фронт и сервер меняются вместе и не могут разойтись.
  */
 export const CITIES = [
-  { id: 'medina', label: 'Медина', enabled: true },
-  { id: 'makkah', label: 'Мекка', enabled: true },
-  { id: 'jeddah', label: 'Джидда', enabled: false },
-  { id: 'riyadh', label: 'Эр-Рияд', enabled: false },
-  { id: 'dammam', label: 'Даммам', enabled: false },
-  { id: 'taif', label: 'Таиф', enabled: false },
-  { id: 'yanbu', label: 'Янбу', enabled: false },
+  { id: 'medina', label: 'Медина' },
+  { id: 'makkah', label: 'Мекка' },
+  { id: 'jeddah', label: 'Джидда' },
+  { id: 'riyadh', label: 'Эр-Рияд' },
+  { id: 'dammam', label: 'Даммам' },
+  { id: 'taif', label: 'Таиф' },
+  { id: 'yanbu', label: 'Янбу' },
 ];
 
 /** Города, открытые людям. Интерфейс работает только с ними. */
