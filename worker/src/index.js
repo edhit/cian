@@ -17,6 +17,65 @@ const SUBMIT_LIMIT_PER_HOUR = 5;
 const REPORT_LIMIT_PER_HOUR = 20;
 const DEFAULT_TTL_DAYS = 30;
 
+/**
+ * Без привязки к D1 любой запрос падал с необработанным исключением, а Cloudflare
+ * отвечал своей страницей Error 1101 — без CORS-заголовков и без намёка на причину.
+ * Лучше честно сказать, что база не подключена.
+ */
+function requireDb(request, env) {
+  if (env && env.DB && typeof env.DB.prepare === 'function') return null;
+  console.error(
+    'Привязка D1 (DB) недоступна. Проверьте database_id в wrangler.toml — ' +
+      'по умолчанию там заглушка из нулей — и что миграции применены с --remote.',
+  );
+  return error(503, 'no-database', { request, env });
+}
+
+function requireBucket(request, env) {
+  if (env && env.PHOTOS && typeof env.PHOTOS.get === 'function') return null;
+  console.error('Привязка R2 (PHOTOS) недоступна. Создайте бакет и проверьте bucket_name.');
+  return error(503, 'no-bucket', { request, env });
+}
+
+/** Что настроено, а что нет. Значения секретов наружу не отдаются — только факт. */
+async function health(request, env) {
+  const checks = {
+    ok: true,
+    db: 'нет привязки',
+    r2: 'нет привязки',
+    botToken: Boolean(env && env.BOT_TOKEN),
+    ingestToken: Boolean(env && env.INGEST_TOKEN),
+    allowedOrigins: String((env && env.ALLOWED_ORIGINS) || '*'),
+  };
+
+  if (env && env.DB && typeof env.DB.prepare === 'function') {
+    try {
+      const row = await env.DB.prepare('SELECT COUNT(*) AS n FROM listings').first();
+      checks.db = 'ок';
+      checks.listings = Number(row && row.n) || 0;
+    } catch (cause) {
+      const message = String((cause && cause.message) || cause);
+      checks.db = /no such table/i.test(message)
+        ? 'таблиц нет — примените миграции: wrangler d1 migrations apply realty --remote'
+        : `ошибка: ${message}`;
+      checks.ok = false;
+    }
+  } else {
+    checks.ok = false;
+  }
+
+  if (env && env.PHOTOS && typeof env.PHOTOS.head === 'function') {
+    try {
+      await env.PHOTOS.head('__health__');
+      checks.r2 = 'ок';
+    } catch (cause) {
+      checks.r2 = `ошибка: ${(cause && cause.message) || cause}`;
+    }
+  }
+
+  return json(checks, { request, env, status: checks.ok ? 200 : 503 });
+}
+
 function parseFilters(url) {
   const p = url.searchParams;
   return {
@@ -264,6 +323,45 @@ async function getPhoto(request, env, key) {
 // Сколько дней хранить объявление после того, как истёк его срок.
 const KEEP_EXPIRED_DAYS = 60;
 
+async function route(request, env) {
+  const url = new URL(request.url);
+  const path = url.pathname.replace(/\/+$/, '') || '/';
+  const method = request.method.toUpperCase();
+
+  if (method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: corsHeaders(request, env) });
+  }
+
+  if (path === '/health') return health(request, env);
+
+  const photo = path.match(/^\/photos\/(.+)$/);
+  if (photo && (method === 'PUT' || method === 'GET')) {
+    const missing = requireBucket(request, env);
+    if (missing) return missing;
+    return method === 'PUT'
+      ? putPhoto(request, env, decodeURIComponent(photo[1]))
+      : getPhoto(request, env, decodeURIComponent(photo[1]));
+  }
+
+  // Всё остальное читает или пишет базу.
+  const missingDb = requireDb(request, env);
+  if (missingDb) return missingDb;
+
+  if (path === '/listings' && method === 'GET') return listListings(request, env, url);
+  if (path === '/facets' && method === 'GET') return facets(request, env, url);
+  if (path === '/listings' && method === 'POST') return createListing(request, env);
+  if (path === '/my/listings' && method === 'GET') return myListings(request, env);
+  if (path === '/ingest' && method === 'POST') return ingest(request, env);
+
+  const report = path.match(/^\/listings\/([^/]+)\/report$/);
+  if (report && method === 'POST') return reportListing(request, env, decodeURIComponent(report[1]));
+
+  const detail = path.match(/^\/listings\/([^/]+)$/);
+  if (detail && method === 'GET') return getListingById(request, env, decodeURIComponent(detail[1]));
+
+  return error(404, 'not-found', { request, env });
+}
+
 export default {
   /** Ночная уборка: без неё база растёт вечно. */
   async scheduled(event, env) {
@@ -284,37 +382,13 @@ export default {
   },
 
   async fetch(request, env) {
-    const url = new URL(request.url);
-    const path = url.pathname.replace(/\/+$/, '') || '/';
-    const method = request.method.toUpperCase();
-
-    if (method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: corsHeaders(request, env) });
-    }
-
+    // Перехват охватывает и разбор адреса, и предварительный запрос: всё, что
+    // вылетит отсюда, Cloudflare покажет как Error 1101 без единого заголовка.
     try {
-      if (path === '/health') return json({ ok: true }, { request, env });
-
-      if (path === '/listings' && method === 'GET') return listListings(request, env, url);
-      if (path === '/facets' && method === 'GET') return facets(request, env, url);
-      if (path === '/listings' && method === 'POST') return createListing(request, env);
-      if (path === '/my/listings' && method === 'GET') return myListings(request, env);
-      if (path === '/ingest' && method === 'POST') return ingest(request, env);
-
-      const report = path.match(/^\/listings\/([^/]+)\/report$/);
-      if (report && method === 'POST') return reportListing(request, env, decodeURIComponent(report[1]));
-
-      const detail = path.match(/^\/listings\/([^/]+)$/);
-      if (detail && method === 'GET') return getListingById(request, env, decodeURIComponent(detail[1]));
-
-      const photo = path.match(/^\/photos\/(.+)$/);
-      if (photo && method === 'PUT') return putPhoto(request, env, decodeURIComponent(photo[1]));
-      if (photo && method === 'GET') return getPhoto(request, env, decodeURIComponent(photo[1]));
-
-      return error(404, 'not-found', { request, env });
+      return await route(request, env);
     } catch (cause) {
-      // Наружу — только код. Подробности в логах Worker.
-      console.error('unhandled', cause?.stack || cause);
+      // Наружу — только код. Подробности в логах: wrangler tail.
+      console.error('unhandled', (cause && cause.stack) || cause);
       return error(500, 'internal', { request, env });
     }
   },

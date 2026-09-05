@@ -171,10 +171,19 @@ export function haptic(type = 'light') {
 
 /* -------------------------------- хранилище ------------------------------ */
 
+const CLOUD_STORAGE_SINCE = '6.9';
+
 function cloudStorage() {
   const cs = tg && tg.CloudStorage;
-  // CloudStorage появился в 6.9; в старых клиентах объект есть, но методов нет.
   if (!cs || typeof cs.getItem !== 'function' || typeof cs.setItem !== 'function') return null;
+
+  // В клиентах до 6.9 методы существуют, но вместо работы пишут в консоль
+  // «CloudStorage is not supported» и не зовут обратный вызов. Без этой проверки
+  // каждый ключ ждал бы своего таймаута на старте приложения.
+  if (typeof tg.isVersionAtLeast === 'function' && !safe(() => tg.isVersionAtLeast(CLOUD_STORAGE_SINCE), false)) {
+    return null;
+  }
+
   return cs;
 }
 

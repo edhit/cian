@@ -14,11 +14,21 @@ export function normalizeOrigin(value) {
 }
 
 export function corsHeaders(request, env) {
-  const allowed = (env.ALLOWED_ORIGINS || '*')
+  // Этот вызов стоит и в обработчике ошибок, поэтому сам он падать не имеет права:
+  // иначе вместо понятного ответа наружу уйдёт голая пятисотка без заголовков.
+  try {
+    return buildCorsHeaders(request, env);
+  } catch {
+    return { 'Access-Control-Allow-Origin': '*' };
+  }
+}
+
+function buildCorsHeaders(request, env = {}) {
+  const allowed = ((env && env.ALLOWED_ORIGINS) || '*')
     .split(',')
     .map(normalizeOrigin)
     .filter(Boolean);
-  const origin = normalizeOrigin(request.headers.get('Origin'));
+  const origin = normalizeOrigin(request && request.headers && request.headers.get('Origin'));
   const anyOrigin = allowed.includes('*');
   const allow = anyOrigin ? '*' : allowed.includes(origin) ? origin : '';
 

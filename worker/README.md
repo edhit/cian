@@ -57,6 +57,41 @@ ALLOWED_ORIGINS=https://cianksa.pages.dev/
 
 Значения из `.dev.vars` перекрывают `[vars]` из `wrangler.toml` только локально.
 
+## Если что-то не работает
+
+Первым делом откройте `/health` — он отвечает без базы и перечисляет, что настроено:
+
+```bash
+curl https://realty-api.<аккаунт>.workers.dev/health
+```
+
+```json
+{"ok":true,"db":"ок","r2":"ок","botToken":true,"ingestToken":true,
+ "allowedOrigins":"https://имя.pages.dev","listings":150}
+```
+
+Значения секретов наружу не отдаются — только факт, что они заданы.
+
+**Error 1101 или 500 без заголовка `Access-Control-Allow-Origin`.** Эту страницу
+рисует Cloudflare, когда код Worker бросил необработанное исключение или вовсе
+не запустился; CORS-заголовков в ней нет, поэтому браузер жалуется на CORS, хотя
+причина другая. Смотрите настоящую ошибку в `wrangler tail`. Самая частая причина —
+`database_id` в `wrangler.toml` остался заглушкой из нулей: подставьте туда
+идентификатор из вывода `wrangler d1 create realty`.
+
+**`{"error":"no-database"}` со статусом 503.** Привязка D1 не доехала до Worker.
+Проверьте `database_id` и что развёртывание прошло после его правки.
+
+**`{"db":"таблиц нет"}` в `/health`.** Миграции применены только локально:
+
+```bash
+wrangler d1 migrations apply realty --remote
+```
+
+**Запрос блокируется по CORS, а `/health` при этом отвечает.** Адрес фронта
+не совпал с `ALLOWED_ORIGINS`. Точную причину Worker пишет в лог — смотрите
+`wrangler tail`.
+
 ## Контракт
 
 ```
@@ -75,7 +110,7 @@ GET  /my/listings                  → { items, total }     Authorization: tma <
 POST /ingest                       → { ok, upserted, skipped }   Authorization: Bearer <INGEST_TOKEN>
 PUT  /photos/:key                  → { ok, key, url }            Authorization: Bearer <INGEST_TOKEN>
 GET  /photos/:key                  → сама картинка
-GET  /health                       → { ok }
+GET  /health                       → состояние привязок и настроек
 ```
 
 ## Порядок выдачи
