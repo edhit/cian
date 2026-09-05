@@ -27,14 +27,6 @@ INIT_DATA_MAX_AGE = "86400"
 REPORT_THRESHOLD = "5"
 # Публичный адрес самого Worker — из него собираются ссылки на фотографии.
 PUBLIC_BASE = ""
-<<<<<<< Updated upstream
-# Идентификаторы админов через запятую: им бот присылает заявки на проверку.
-# Свой узнать можно у @userinfobot.
-ADMIN_IDS = ""
-=======
-# Свой узнать можно у @userinfobot.
-ADMIN_IDS = "240400422"
->>>>>>> Stashed changes
 
 # Секреты задаются отдельно и в файл не попадают:
 #   wrangler secret put BOT_TOKEN                — токен бота: и проверка initData, и модерация

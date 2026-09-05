@@ -12,11 +12,11 @@
 export const CITIES = [
   { id: 'medina', label: 'Медина' },
   { id: 'makkah', label: 'Мекка' },
-  { id: 'jeddah', label: 'Джидда' },
-  { id: 'riyadh', label: 'Эр-Рияд' },
-  { id: 'dammam', label: 'Даммам' },
-  { id: 'taif', label: 'Таиф' },
-  { id: 'yanbu', label: 'Янбу' },
+  // { id: 'jeddah', label: 'Джидда' },
+  // { id: 'riyadh', label: 'Эр-Рияд' },
+  // { id: 'dammam', label: 'Даммам' },
+  // { id: 'taif', label: 'Таиф' },
+  // { id: 'yanbu', label: 'Янбу' },
 ];
 
 /** Города, открытые людям. Интерфейс работает только с ними. */
