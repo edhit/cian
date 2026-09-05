@@ -39,6 +39,23 @@ function requireBucket(request, env) {
   return error(503, 'no-bucket', { request, env });
 }
 
+// Всё, без чего какой-нибудь маршрут перестанет работать.
+const REQUIRED_TABLES = [
+  'listings',
+  'reports',
+  'trusted_contacts',
+  'moderation_messages',
+  'user_photos',
+];
+
+async function missingTables(env) {
+  const rows = await env.DB.prepare(
+    "SELECT name FROM sqlite_master WHERE type = 'table'",
+  ).all();
+  const present = new Set((rows.results || []).map((row) => row.name));
+  return REQUIRED_TABLES.filter((name) => !present.has(name));
+}
+
 /** Что настроено, а что нет. Значения секретов наружу не отдаются — только факт. */
 async function health(request, env) {
   const checks = {
@@ -55,6 +72,14 @@ async function health(request, env) {
       const row = await env.DB.prepare('SELECT COUNT(*) AS n FROM listings').first();
       checks.db = 'ок';
       checks.listings = Number(row && row.n) || 0;
+
+      // Проверяем не только связь, но и полноту схемы: чаще всего забывают
+      // применить свежую миграцию, и падает только один маршрут из десяти.
+      const missing = await missingTables(env);
+      if (missing.length > 0) {
+        checks.db = `не хватает таблиц: ${missing.join(', ')} — wrangler d1 migrations apply realty --remote`;
+        checks.ok = false;
+      }
     } catch (cause) {
       const message = String((cause && cause.message) || cause);
       checks.db = /no such table/i.test(message)
@@ -453,6 +478,18 @@ export default {
     try {
       return await route(request, env);
     } catch (cause) {
+      const message = String((cause && cause.message) || cause);
+
+      // Схема базы отстала от кода. Раньше это выглядело как безликая пятисотка,
+      // хотя лечится одной командой.
+      if (/no such table|no such column/i.test(message)) {
+        console.error(
+          `База не совпадает с кодом (${message}). ` +
+            'Примените миграции: wrangler d1 migrations apply realty --remote',
+        );
+        return error(503, 'no-migration', { request, env });
+      }
+
       // Наружу — только код. Подробности в логах: wrangler tail.
       console.error('unhandled', (cause && cause.stack) || cause);
       return error(500, 'internal', { request, env });

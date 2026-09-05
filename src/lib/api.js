@@ -75,6 +75,26 @@ function explainFetchFailure(path, cause) {
   );
 }
 
+/**
+ * Превращает неудачный ответ в причину. Код сервера пишем в консоль: иначе
+ * «сервер не принял» одинаково означает и непринятую миграцию, и упавший запрос,
+ * и отладка сводится к угадыванию.
+ */
+export function failureReason(what, status, data) {
+  const serverError = data && data.error ? String(data.error) : '';
+  console.error(`${what}: сервер ответил ${status}${serverError ? ` (${serverError})` : ''}`);
+
+  if (status === 401) return 'unauthorized';
+  if (status === 413) return 'too-large';
+  if (status === 415) return 'bad-type';
+  if (status === 422) return 'invalid';
+  if (status === 429) return 'too-many';
+  if (serverError === 'no-migration') return 'no-migration';
+  if (serverError === 'no-database' || serverError === 'no-bucket') return 'not-configured';
+  if (status >= 500) return 'server-error';
+  return 'server';
+}
+
 /** Запрос, который не бросает на 4xx: вызывающему нужен разбор причины. */
 async function requestRaw(path, options = {}) {
   let response;
@@ -223,10 +243,10 @@ export async function submitListing(payload) {
     });
 
     // Причину показываем человеку словами, поэтому коды разбираем здесь, а не в шторке.
-    if (status === 401) return { ok: false, reason: 'unauthorized' };
     if (status === 422) return { ok: false, reason: 'invalid', fields: (data && data.fields) || [] };
-    if (status === 429) return { ok: false, reason: 'too-many' };
-    if (!ok || !data || !data.ok) return { ok: false, reason: 'server' };
+    if (!ok || !data || !data.ok) {
+      return { ok: false, reason: failureReason('Отправка заявки', status, data) };
+    }
 
     return { ok: true, id: data.id, status: data.status || 'pending' };
   } catch {
@@ -271,11 +291,9 @@ export async function uploadPhoto(blob) {
     });
     const data = await response.json().catch(() => null);
 
-    if (response.status === 401) return { ok: false, reason: 'unauthorized' };
-    if (response.status === 413) return { ok: false, reason: 'too-large' };
-    if (response.status === 415) return { ok: false, reason: 'bad-type' };
-    if (response.status === 429) return { ok: false, reason: 'too-many' };
-    if (!response.ok || !data || !data.ok) return { ok: false, reason: 'server' };
+    if (!response.ok || !data || !data.ok) {
+      return { ok: false, reason: failureReason('Загрузка фотографии', response.status, data) };
+    }
 
     return { ok: true, url: data.url, key: data.key };
   } catch (cause) {

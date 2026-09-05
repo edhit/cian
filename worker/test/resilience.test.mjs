@@ -62,16 +62,6 @@ test('/health сообщает про непринятые миграции', as
   assert.match(body.db, /миграции/);
 });
 
-test('/health подтверждает исправную базу', async () => {
-  const env = { DB: { prepare: () => ({ first: async () => ({ n: 42 }) }) } };
-  const res = await call('/health', { env });
-  assert.equal(res.status, 200);
-
-  const body = await res.json();
-  assert.equal(body.db, 'ок');
-  assert.equal(body.listings, 42);
-});
-
 test('фотографии без бакета тоже отвечают понятно', async () => {
   const res = await call('/photos/x.png');
   assert.equal(res.status, 503);
@@ -91,4 +81,53 @@ test('битый адрес не роняет обработчик', async () =>
   const res = await worker.fetch(new Request('https://realty-api.example/listings?q=%'), {});
   assert.ok(res.status === 503 || res.status === 500);
   assert.ok(res.headers.get('Access-Control-Allow-Origin'));
+});
+
+test('отставшая схема базы называется по имени, а не «внутренней ошибкой»', async () => {
+  // Именно так это выглядело у пользователя: в wrangler tail «Ok», а в интерфейсе
+  // безликое «сервер не принял файл».
+  const env = {
+    PHOTOS: { get: async () => null, put: async () => {} },
+    DB: { prepare: () => { throw new Error('D1_ERROR: no such table: user_photos'); } },
+  };
+  const res = await call('/listings?city=medina', { env });
+  assert.equal(res.status, 503);
+  assert.equal((await res.json()).error, 'no-migration');
+});
+
+test('/health перечисляет недостающие таблицы поимённо', async () => {
+  const present = ['listings', 'reports'];
+  const env = {
+    DB: {
+      prepare: (sql) => ({
+        first: async () => ({ n: 5 }),
+        all: async () =>
+          sql.includes('sqlite_master') ? { results: present.map((name) => ({ name })) } : { results: [] },
+      }),
+    },
+  };
+
+  const body = await (await call('/health', { env })).json();
+  assert.equal(body.ok, false);
+  assert.match(body.db, /не хватает таблиц/);
+  for (const missing of ['trusted_contacts', 'moderation_messages', 'user_photos']) {
+    assert.match(body.db, new RegExp(missing));
+  }
+  assert.match(body.db, /migrations apply/);
+});
+
+test('полная схема считается здоровой', async () => {
+  const all = ['listings', 'reports', 'trusted_contacts', 'moderation_messages', 'user_photos'];
+  const env = {
+    DB: {
+      prepare: (sql) => ({
+        first: async () => ({ n: 7 }),
+        all: async () =>
+          sql.includes('sqlite_master') ? { results: all.map((name) => ({ name })) } : { results: [] },
+      }),
+    },
+  };
+  const res = await call('/health', { env });
+  assert.equal(res.status, 200);
+  assert.equal((await res.json()).db, 'ок');
 });
