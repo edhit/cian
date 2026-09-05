@@ -254,6 +254,36 @@ export async function getMyListings() {
   }
 }
 
+/**
+ * Отправляет фотографию в R2 через Worker. Имя файла назначает сервер,
+ * права подтверждает initData — секрет парсера человеку не выдаётся.
+ *
+ * @returns {Promise<{ok: true, url: string} | {ok: false, reason: string}>}
+ */
+export async function uploadPhoto(blob) {
+  if (!hasBackend) return NO_BACKEND;
+
+  try {
+    const response = await fetch(`${BASE}/photos`, {
+      method: 'POST',
+      headers: { 'Content-Type': blob.type || 'image/jpeg', ...authHeaders() },
+      body: blob,
+    });
+    const data = await response.json().catch(() => null);
+
+    if (response.status === 401) return { ok: false, reason: 'unauthorized' };
+    if (response.status === 413) return { ok: false, reason: 'too-large' };
+    if (response.status === 415) return { ok: false, reason: 'bad-type' };
+    if (response.status === 429) return { ok: false, reason: 'too-many' };
+    if (!response.ok || !data || !data.ok) return { ok: false, reason: 'server' };
+
+    return { ok: true, url: data.url, key: data.key };
+  } catch (cause) {
+    explainFetchFailure('/photos', cause);
+    return { ok: false, reason: 'network' };
+  }
+}
+
 export async function reportListing(id, reason) {
   if (!hasBackend) return NO_BACKEND;
   try {

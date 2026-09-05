@@ -3,9 +3,10 @@ import { Check, ChevronRight, TriangleAlert } from 'lucide-react';
 import { Sheet } from './Sheet.jsx';
 import { Segmented } from './Chips.jsx';
 import { Field, NumberInput, PickMany, PickOne, TextArea, TextInput, Toggle } from './Form.jsx';
+import { PhotoPicker } from './PhotoPicker.jsx';
 import { submitListing } from '../lib/api.js';
 import {
-  CITIES,
+  activeCities,
   DEAL_TYPES,
   FEATURE_LABELS,
   districtsOf,
@@ -32,6 +33,7 @@ function emptyDraft(city) {
     furnished: false,
     features: [],
     description: '',
+    photos: [],
     contact: { telegram: '', phone: '' },
   };
 }
@@ -207,7 +209,7 @@ export function SubmitSheet({ open, onClose, city, onSubmitted, onOpenMine }) {
 
           <Field label="Город" invalid={invalid.has('city')}>
             <PickOne
-              options={CITIES}
+              options={activeCities()}
               value={draft.city}
               invalid={invalid.has('city')}
               onChange={(nextCity) => patch({ city: nextCity, district: '' })}
@@ -298,6 +300,20 @@ export function SubmitSheet({ open, onClose, city, onSubmitted, onOpenMine }) {
         </div>
 
         <div className="overflow-hidden rounded-[10px] bg-card">
+          <Field label="Фотографии" invalid={invalid.has('photos')}>
+            <PhotoPicker
+              urls={draft.photos}
+              onChange={(update) =>
+                setDraft((prev) => ({
+                  ...prev,
+                  photos: typeof update === 'function' ? update(prev.photos) : update,
+                }))
+              }
+            />
+          </Field>
+        </div>
+
+        <div className="overflow-hidden rounded-[10px] bg-card">
           <Field label="Описание" hint={`${draft.description.length} из 4000`}>
             <TextArea
               value={draft.description}
@@ -339,7 +355,6 @@ export function SubmitSheet({ open, onClose, city, onSubmitted, onOpenMine }) {
         </div>
 
         <p className="px-1 text-caption text-label-3">
-          Фотографии пока не прикладываются: на этом этапе их собирает только парсер.
           Объявление публикуется после проверки.
         </p>
       </div>

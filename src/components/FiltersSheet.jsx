@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Sheet } from './Sheet.jsx';
 import { Segmented } from './Chips.jsx';
-import { CITIES, DEAL_TYPES, EMPTY_FILTERS, ROOM_OPTIONS, districtsOf } from '../lib/schema.js';
+import {
+  DEAL_TYPES,
+  EMPTY_FILTERS,
+  ROOM_OPTIONS,
+  activeCities,
+  districtsOf,
+} from '../lib/schema.js';
 import { haptic } from '../lib/telegram.js';
 
 function Row({ label, children }) {
@@ -107,7 +113,7 @@ export function FiltersSheet({ open, onClose, filters, onApply, total }) {
 
           <Row label="Город">
             <OptionGrid
-              options={CITIES}
+              options={activeCities()}
               value={draft.city}
               allLabel="Все"
               onChange={(city) =>

@@ -1,6 +1,6 @@
 import { Check } from 'lucide-react';
 import { Sheet, useSheet } from './Sheet.jsx';
-import { CITIES } from '../lib/schema.js';
+import { activeCities } from '../lib/schema.js';
 
 function CityRow({ city, counts, selected, onSelect }) {
   const close = useSheet();
@@ -32,7 +32,7 @@ export function CitySheet({ open, onClose, city, counts, onSelect }) {
     <Sheet open={open} onClose={onClose} title="Город">
       <div className="p-4">
         <div className="overflow-hidden rounded-[10px] bg-card">
-          {CITIES.map((item, index) => (
+          {activeCities().map((item, index) => (
             <div key={item.id} className={index > 0 ? 'border-t border-separator' : ''}>
               <CityRow city={item} counts={counts} selected={item.id === city} onSelect={onSelect} />
             </div>

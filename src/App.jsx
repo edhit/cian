@@ -11,12 +11,21 @@ import { FavoritesSheet } from './components/FavoritesSheet.jsx';
 import { SubmitSheet } from './components/SubmitSheet.jsx';
 import { MyListingsSheet } from './components/MyListingsSheet.jsx';
 import { CompareSheet } from './components/CompareSheet.jsx';
+import { Ad } from './components/Ad.jsx';
 import { useListings } from './hooks/useListings.js';
 import { useFavorites } from './hooks/useFavorites.js';
 import { useDebounced } from './hooks/useDebounced.js';
 import { getCityCounts, hasBackend } from './lib/api.js';
-import { CITIES, EMPTY_FILTERS, districtsOf, countActiveFilters, makeFilters } from './lib/schema.js';
+import {
+  EMPTY_FILTERS,
+  countActiveFilters,
+  districtsOf,
+  isCityEnabled,
+  makeFilters,
+} from './lib/schema.js';
 import { plural } from './lib/format.js';
+import { activeAds, buildFeed } from './lib/adsFeed.js';
+import { ads as adsSource, placeholderAd } from './ads.js';
 import { storage } from './lib/storage.js';
 import { haptic } from './lib/telegram.js';
 
@@ -42,7 +51,9 @@ export default function App() {
     Promise.all([storage.loadCity(), storage.loadFilters()]).then(([city, saved]) => {
       if (cancelled) return;
       const restored = makeFilters(saved);
-      if (city && CITIES.some((c) => c.id === city)) restored.city = city;
+      // Сохранённый город мог быть выключен с прошлого запуска — тогда берём умолчание.
+      if (isCityEnabled(city)) restored.city = city;
+      if (!isCityEnabled(restored.city)) restored.city = EMPTY_FILTERS.city;
       restored.q = '';
       setFilters(restored);
       setSettingsLoaded(true);
@@ -96,6 +107,17 @@ export default function App() {
     // Районы у городов разные — старый выбор после смены города бессмыслен.
     setFilters((prev) => ({ ...prev, city, district: '' }));
   }, []);
+
+  // Реклама отбирается один раз: список статический, пересчитывать его не на чем.
+  const liveAds = useMemo(() => {
+    const live = activeAds(adsSource);
+    return live.length > 0 ? live : activeAds([placeholderAd]);
+  }, []);
+
+  const feedBlocks = useMemo(
+    () => buildFeed(items, liveAds, { hasMore }),
+    [items, liveAds, hasMore],
+  );
 
   const districtOptions = useMemo(
     () => [{ id: '', label: 'Все районы' }, ...districtsOf(filters.city)],
@@ -164,12 +186,21 @@ export default function App() {
           />
         ) : (
           <>
-            <ListingList
-              items={items}
-              isFavorite={favorites.has}
-              onToggleFavorite={favorites.toggle}
-              onOpen={openCard}
-            />
+            <div className="space-y-3">
+              {feedBlocks.map((block, index) =>
+                block.type === 'ad' ? (
+                  <Ad key={block.key} ad={block.ad} />
+                ) : (
+                  <ListingList
+                    key={`listings-${index}`}
+                    items={block.items}
+                    isFavorite={favorites.has}
+                    onToggleFavorite={favorites.toggle}
+                    onOpen={openCard}
+                  />
+                ),
+              )}
+            </div>
 
             <div ref={sentinel} aria-hidden="true" className="h-1" />
 

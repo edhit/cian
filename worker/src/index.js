@@ -4,12 +4,14 @@
 //   POST /listings                 Authorization: tma <initData>
 //   POST /listings/:id/report      Authorization: tma <initData>
 // Сверх контракта: /facets для счётчиков по городам, /my/listings для «ваших
-// объявлений», /ingest для парсера, /photos/* для фотографий в R2.
+// объявлений», /ingest для парсера, /photos/* для фотографий в R2,
+// /telegram/webhook для модерации через бота.
 
 import { authenticate, authenticateIngest } from './auth.js';
 import { FEED_ORDER, feedConditions, listingToRow, rowToListing, upsertStatement } from './db.js';
 import { corsHeaders, error, json, readJson } from './http.js';
 import { normalizeListing, validateSubmission } from './schema.js';
+import { handleWebhook, isTrusted, matchesTrusted, notifyAdmins, trustedSet } from './moderation.js';
 
 const MAX_LIMIT = 50;
 const DEFAULT_LIMIT = 20;
@@ -185,9 +187,15 @@ async function createListing(request, env) {
   item.publishedAt = now.toISOString();
   item.expiresAt = new Date(now.getTime() + DEFAULT_TTL_DAYS * 86400_000).toISOString();
 
+  // Плашку «проверено» получает только тот, кого владелец доски знает лично.
+  item.verified = await isTrusted(env, item.contact);
+
   // Заявка ждёт модерации: в ленту она попадёт после проверки, а не сразу.
   const row = listingToRow(item, { status: 'pending', origin: 'user', authorId: user.id });
   await upsertStatement(env.DB, row).run();
+
+  // Сбой телеграма не должен отражаться на человеке: заявка уже сохранена.
+  await notifyAdmins(env, item, user);
 
   return json({ ok: true, id: item.id, status: 'pending' }, { request, env, status: 201 });
 }
@@ -260,6 +268,7 @@ async function ingest(request, env) {
   const items = Array.isArray(body.value?.items) ? body.value.items : [];
   if (items.length === 0) return json({ ok: true, upserted: 0, skipped: 0 }, { request, env });
 
+  const trusted = await trustedSet(env);
   const statements = [];
   let skipped = 0;
 
@@ -270,6 +279,8 @@ async function ingest(request, env) {
       skipped += 1;
       continue;
     }
+    // Парсер не решает, кто проверенный: это определяет список доверенных контактов.
+    item.verified = matchesTrusted(trusted, item.contact);
     statements.push(upsertStatement(env.DB, listingToRow(item, { status: 'published', origin: 'parser' })));
   }
 
@@ -285,6 +296,46 @@ async function ingest(request, env) {
 
 const PHOTO_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+
+const PHOTO_EXT = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+const USER_PHOTOS_PER_HOUR = 30;
+
+/**
+ * Загрузка фотографии из мини-приложения. Секрет парсера человеку не выдаётся,
+ * поэтому здесь права подтверждает initData, а имя файла назначает сервер.
+ */
+async function uploadUserPhoto(request, env) {
+  const user = await authenticate(request, env);
+  if (!user) return error(401, 'unauthorized', { request, env });
+
+  const type = (request.headers.get('Content-Type') || '').split(';')[0].trim();
+  if (!PHOTO_TYPES.has(type)) return error(415, 'bad-type', { request, env });
+
+  const bytes = await request.arrayBuffer();
+  if (bytes.byteLength === 0) return error(400, 'empty', { request, env });
+  if (bytes.byteLength > MAX_PHOTO_BYTES) return error(413, 'too-large', { request, env });
+
+  const since = new Date(Date.now() - 3600_000).toISOString();
+  const recent = await env.DB.prepare(
+    'SELECT COUNT(*) AS n FROM user_photos WHERE user_id = ? AND created_at >= ?',
+  )
+    .bind(user.id, since)
+    .first();
+  if ((Number(recent && recent.n) || 0) >= USER_PHOTOS_PER_HOUR) {
+    return error(429, 'too-many-photos', { request, env });
+  }
+
+  const key = `u${user.id}-${crypto.randomUUID()}.${PHOTO_EXT[type]}`;
+  await env.PHOTOS.put(key, bytes, { httpMetadata: { contentType: type } });
+  await env.DB.prepare(
+    'INSERT INTO user_photos (key, user_id, bytes, created_at) VALUES (?, ?, ?, ?)',
+  )
+    .bind(key, user.id, bytes.byteLength, new Date().toISOString())
+    .run();
+
+  const base = (env.PUBLIC_BASE || '').replace(/\/+$/, '') || new URL(request.url).origin;
+  return json({ ok: true, key, url: `${base}/photos/${key}` }, { request, env, status: 201 });
+}
 
 async function putPhoto(request, env, key) {
   if (!authenticateIngest(request, env)) return error(401, 'unauthorized', { request, env });
@@ -334,6 +385,13 @@ async function route(request, env) {
 
   if (path === '/health') return health(request, env);
 
+  // Вебхук телеграма проверяет себя сам по секретному заголовку.
+  if (path === '/telegram/webhook' && method === 'POST') {
+    const missing = requireDb(request, env);
+    if (missing) return missing;
+    return handleWebhook(request, env);
+  }
+
   const photo = path.match(/^\/photos\/(.+)$/);
   if (photo && (method === 'PUT' || method === 'GET')) {
     const missing = requireBucket(request, env);
@@ -341,6 +399,14 @@ async function route(request, env) {
     return method === 'PUT'
       ? putPhoto(request, env, decodeURIComponent(photo[1]))
       : getPhoto(request, env, decodeURIComponent(photo[1]));
+  }
+
+  if (path === '/photos' && method === 'POST') {
+    const noBucket = requireBucket(request, env);
+    if (noBucket) return noBucket;
+    const noDb = requireDb(request, env);
+    if (noDb) return noDb;
+    return uploadUserPhoto(request, env);
   }
 
   // Всё остальное читает или пишет базу.

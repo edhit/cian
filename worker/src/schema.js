@@ -1,15 +1,32 @@
 // Единственный источник правды о полях объявления.
 // Файл копируется в проект Worker без изменений — никаких импортов и браузерных API.
 
+/**
+ * Города. `enabled: false` — город заведён, но ещё не запущен: его не показывают
+ * в интерфейсе и не принимают в заявках. Данные парсера при этом можно копить
+ * заранее — они просто не видны, пока город не включат.
+ *
+ * Чтобы запустить город, достаточно поменять здесь один флаг: файл общий
+ * с Worker, поэтому фронт и сервер меняются вместе и не могут разойтись.
+ */
 export const CITIES = [
-  { id: 'medina', label: 'Медина' },
-  { id: 'makkah', label: 'Мекка' },
-  { id: 'jeddah', label: 'Джидда' },
-  { id: 'riyadh', label: 'Эр-Рияд' },
-  { id: 'dammam', label: 'Даммам' },
-  { id: 'taif', label: 'Таиф' },
-  { id: 'yanbu', label: 'Янбу' },
+  { id: 'medina', label: 'Медина', enabled: true },
+  { id: 'makkah', label: 'Мекка', enabled: true },
+  { id: 'jeddah', label: 'Джидда', enabled: false },
+  { id: 'riyadh', label: 'Эр-Рияд', enabled: false },
+  { id: 'dammam', label: 'Даммам', enabled: false },
+  { id: 'taif', label: 'Таиф', enabled: false },
+  { id: 'yanbu', label: 'Янбу', enabled: false },
 ];
+
+/** Города, открытые людям. Интерфейс работает только с ними. */
+export function activeCities() {
+  return CITIES.filter((city) => city.enabled !== false);
+}
+
+export function isCityEnabled(city) {
+  return activeCities().some((item) => item.id === city);
+}
 
 export const DISTRICTS = {
   medina: [
@@ -322,7 +339,7 @@ export function validateSubmission(payload) {
   const raw = payload && typeof payload === 'object' ? payload : {};
 
   if (!DEAL_TYPES.some((d) => d.id === raw.dealType)) errors.push('dealType');
-  if (!CITIES.some((c) => c.id === raw.city)) errors.push('city');
+  if (!isCityEnabled(raw.city)) errors.push('city');
   if (raw.district && !districtsOf(raw.city).some((d) => d.id === raw.district)) {
     errors.push('district');
   }
